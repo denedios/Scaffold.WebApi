@@ -1,5 +1,6 @@
 namespace Scaffold.WebApi.Filters
 {
+    using System;
     using System.Net;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.Filters;
@@ -32,6 +33,11 @@ namespace Scaffold.WebApi.Filters
                     httpContext: context.HttpContext,
                     statusCode: (int)HttpStatusCode.NotFound,
                     detail: notFoundException.Message));
+            }
+
+            if (context.Exception is OperationCanceledException && context.HttpContext.RequestAborted.IsCancellationRequested)
+            {
+                context.Result = new NoContentResult();
             }
         }
     }

@@ -4,6 +4,7 @@ namespace Scaffold.WebApi.UnitTests.Filters
     using System.Collections.Generic;
     using System.Net;
     using System.Runtime.Serialization;
+    using System.Threading;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.Abstractions;
@@ -78,6 +79,50 @@ namespace Scaffold.WebApi.UnitTests.Filters
 
                 Assert.Equal((int)HttpStatusCode.NotFound, problemDetails.Status);
                 Assert.Equal(exception.Message, problemDetails.Detail);
+            }
+
+            [Fact]
+            public void When_HandlingOperationCanceledException_Expect_NoContentResult()
+            {
+                // Arrange
+                CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+                this.actionContext.HttpContext.RequestAborted = cancellationTokenSource.Token;
+
+                OperationCanceledException exception = new OperationCanceledException();
+
+                ExceptionContext context = new ExceptionContext(this.actionContext, new List<IFilterMetadata>())
+                {
+                    Exception = exception,
+                };
+
+                ExceptionFilter exceptionFilter = new ExceptionFilter(new MockProblemDetailsFactory());
+
+                // Act
+                cancellationTokenSource.Cancel();
+                exceptionFilter.OnException(context);
+
+                // Assert
+                Assert.IsType<NoContentResult>(context.Result);
+            }
+
+            [Fact]
+            public void When_HandlingOperationCanceledException_Expect_NullContextResult()
+            {
+                // Arrange
+                OperationCanceledException exception = new OperationCanceledException();
+
+                ExceptionContext context = new ExceptionContext(this.actionContext, new List<IFilterMetadata>())
+                {
+                    Exception = exception,
+                };
+
+                ExceptionFilter exceptionFilter = new ExceptionFilter(new MockProblemDetailsFactory());
+
+                // Act
+                exceptionFilter.OnException(context);
+
+                // Assert
+                Assert.Null(context.Result);
             }
 
             [Fact]
