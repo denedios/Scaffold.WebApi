@@ -5,6 +5,7 @@ namespace Scaffold.Repositories.PostgreSQL
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
+    using System.Threading;
     using System.Threading.Tasks;
     using Microsoft.EntityFrameworkCore;
     using Scaffold.Application.Interfaces;
@@ -59,19 +60,24 @@ namespace Scaffold.Repositories.PostgreSQL
                 .ToList();
         }
 
-        public Task<Bucket?> GetAsync(int id)
+        public Task<Bucket?> GetAsync(int id, CancellationToken cancellationToken = default)
         {
             return this.context.Set<Bucket>()
                 .Where(bucket => bucket.Id == id)
                 .Include(bucket => bucket.Items)
-                .SingleOrDefaultAsync();
+                .SingleOrDefaultAsync(cancellationToken);
         }
 
-        public Task<List<Bucket>> GetAsync(Expression<Func<Bucket, bool>> predicate, int? limit = null, int? offset = null, Ordering<Bucket>? ordering = null)
+        public Task<List<Bucket>> GetAsync(
+            Expression<Func<Bucket, bool>> predicate,
+            int? limit = null,
+            int? offset = null,
+            Ordering<Bucket>? ordering = null,
+            CancellationToken cancellationToken = default)
         {
             return this.BuildQuery(predicate, limit, offset, ordering)
                 .Include(bucket => bucket.Items)
-                .ToListAsync();
+                .ToListAsync(cancellationToken);
         }
 
         public void Remove(Bucket bucket)
