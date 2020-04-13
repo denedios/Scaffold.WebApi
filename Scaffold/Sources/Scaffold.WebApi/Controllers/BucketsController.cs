@@ -1,6 +1,7 @@
 ﻿namespace Scaffold.WebApi.Controllers
 {
     using System.Collections.Generic;
+    using System.Threading;
     using System.Threading.Tasks;
     using AutoMapper;
     using MediatR;
@@ -44,32 +45,34 @@
         /// <summary>Retrieves a list of buckets.</summary>
         /// <param name="limit">The maximun number of buckets to return from the result set. Defaults to 10.</param>
         /// <param name="offset">The number of buckets to omit from the start of the result set.</param>
+        /// <param name="cancellationToken">The cancellation token to check to see if the request has been aborted.</param>
         /// <returns>A list of Bucket objects.</returns>
         /// <response code="200">Buckets retrieved successfully.</response>
         /// <response code="default">Problem Details (RFC 7807) Response.</response>
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesDefaultResponseType]
-        public async Task<IList<Bucket>> GetBuckets([FromQuery]int? limit, [FromQuery]int? offset)
+        public async Task<IList<Bucket>> GetBuckets([FromQuery]int? limit, [FromQuery]int? offset, CancellationToken cancellationToken)
         {
             GetBuckets.Query query = new GetBuckets.Query { Limit = limit, Offset = offset };
-            GetBuckets.Response response = await this.mediator.Send(query);
+            GetBuckets.Response response = await this.mediator.Send(query, cancellationToken);
 
             return this.mapper.Map<List<Bucket>>(response.Buckets);
         }
 
         /// <summary>Retrieves a bucket.</summary>
         /// <param name="bucketId">The Id. of the Bucket object to be retrieved.</param>
+        /// <param name="cancellationToken">The cancellation token to check to see if the request has been aborted.</param>
         /// <returns>The specified Bucket object.</returns>
         /// <response code="200">Bucket retrieved successfully.</response>
         /// <response code="default">Problem Details (RFC 7807) Response.</response>
         [HttpGet("{bucketId}", Name = "GetBucket")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesDefaultResponseType]
-        public async Task<Bucket> GetBucket(int bucketId)
+        public async Task<Bucket> GetBucket(int bucketId, CancellationToken cancellationToken)
         {
             GetBucket.Query query = new GetBucket.Query { Id = bucketId };
-            GetBucket.Response response = await this.mediator.Send(query);
+            GetBucket.Response response = await this.mediator.Send(query, cancellationToken);
 
             return this.mapper.Map<Bucket>(response.Bucket);
         }
@@ -137,16 +140,17 @@
 
         /// <summary>Retrieves a list of items from a bucket.</summary>
         /// <param name="bucketId">The Id. of the Bucket object to retrieve the items from.</param>
+        /// <param name="cancellationToken">The cancellation token to check to see if the request has been aborted.</param>
         /// <returns>A list of Item objects.</returns>
         /// <response code="200">Items retrieved successfully.</response>
         /// <response code="default">Problem Details (RFC 7807) Response.</response>
         [HttpGet("{bucketId}/Items")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesDefaultResponseType]
-        public async Task<IList<Item>> GetItems(int bucketId)
+        public async Task<IList<Item>> GetItems(int bucketId, CancellationToken cancellationToken)
         {
             GetItems.Query query = new GetItems.Query { BucketId = bucketId };
-            GetItems.Response response = await this.mediator.Send(query);
+            GetItems.Response response = await this.mediator.Send(query, cancellationToken);
 
             return this.mapper.Map<List<Item>>(response.Items);
         }
@@ -154,16 +158,17 @@
         /// <summary>Retrieves an item from a bucket.</summary>
         /// <param name="bucketId">The Id. of the Bucket object to retrieve the item from.</param>
         /// <param name="itemId">The Id. of the Item object to be retrieved.</param>
+        /// <param name="cancellationToken">The cancellation token to check to see if the request has been aborted.</param>
         /// <returns>The specified Item object.</returns>
         /// <response code="200">Item retrieved successfully.</response>
         /// <response code="default">Problem Details (RFC 7807) Response.</response>
         [HttpGet("{bucketId}/Items/{itemId}", Name = "GetItem")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesDefaultResponseType]
-        public async Task<Item> GetItem(int bucketId, int itemId)
+        public async Task<Item> GetItem(int bucketId, int itemId, CancellationToken cancellationToken)
         {
             GetItem.Query query = new GetItem.Query { BucketId = bucketId, ItemId = itemId };
-            GetItem.Response response = await this.mediator.Send(query);
+            GetItem.Response response = await this.mediator.Send(query, cancellationToken);
 
             return this.mapper.Map<Item>(response.Item);
         }

@@ -66,7 +66,7 @@ namespace Scaffold.WebApi.UnitTests.Controllers
                 IList<Bucket> result;
 
                 // Act
-                result = await controller.GetBuckets(null, null);
+                result = await controller.GetBuckets(null, null, default);
 
                 // Assert
                 Assert.NotNull(result);
@@ -85,7 +85,7 @@ namespace Scaffold.WebApi.UnitTests.Controllers
                 Bucket result;
 
                 // Act
-                result = await controller.GetBucket(new Random().Next(int.MaxValue));
+                result = await controller.GetBucket(new Random().Next(int.MaxValue), default);
 
                 // Assert
                 Assert.NotNull(result);
@@ -191,7 +191,7 @@ namespace Scaffold.WebApi.UnitTests.Controllers
                 IList<Item> result;
 
                 // Act
-                result = await controller.GetItems(new Random().Next(int.MaxValue));
+                result = await controller.GetItems(new Random().Next(int.MaxValue), default);
 
                 // Assert
                 Assert.NotNull(result);
@@ -210,7 +210,7 @@ namespace Scaffold.WebApi.UnitTests.Controllers
                 Item result;
 
                 // Act
-                result = await controller.GetItem(new Random().Next(int.MaxValue), new Random().Next(int.MaxValue));
+                result = await controller.GetItem(new Random().Next(int.MaxValue), new Random().Next(int.MaxValue), default);
 
                 // Assert
                 Assert.NotNull(result);
