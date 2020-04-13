@@ -3,6 +3,7 @@ namespace Scaffold.Application.UnitTests.Features.Bucket
     using System;
     using System.Collections.Generic;
     using System.Linq.Expressions;
+    using System.Threading;
     using System.Threading.Tasks;
     using Microsoft.EntityFrameworkCore;
     using Scaffold.Application.Features.Bucket;
@@ -601,6 +602,21 @@ namespace Scaffold.Application.UnitTests.Features.Bucket
                 Assert.Equal("2", response.Buckets[9].Description);
                 Assert.Equal("3", response.Buckets[10].Description);
                 Assert.Equal("3", response.Buckets[11].Description);
+            }
+
+            [Fact]
+            public async Task When_GettingBucketsAndCancellationIsRequested_Expect_OperationCanceledException()
+            {
+                // Arrange
+                GetBuckets.Query query = new GetBuckets.Query();
+                GetBuckets.Handler handler = new GetBuckets.Handler(this.repository);
+
+                // Act
+                Exception exception = await Record.ExceptionAsync(() =>
+                    handler.Handle(query, new CancellationToken(true)));
+
+                // Assert
+                Assert.IsType<OperationCanceledException>(exception);
             }
         }
     }
