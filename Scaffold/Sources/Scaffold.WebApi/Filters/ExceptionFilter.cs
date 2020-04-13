@@ -35,7 +35,7 @@ namespace Scaffold.WebApi.Filters
                     detail: notFoundException.Message));
             }
 
-            if (context.Exception is OperationCanceledException && context.HttpContext.RequestAborted.IsCancellationRequested)
+            if (context.Exception is OperationCanceledException)
             {
                 context.Result = new NoContentResult();
             }
