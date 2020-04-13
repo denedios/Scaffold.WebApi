@@ -81,7 +81,7 @@ namespace Scaffold.WebApi.UnitTests.Filters
             }
 
             [Fact]
-            public void When_HandlingOperationCanceledException_Expect_NoContentResult()
+            public void When_HandlingOperationCanceledException_Expect_StatusCodeResult()
             {
                 // Arrange
                 OperationCanceledException exception = new OperationCanceledException();
@@ -97,7 +97,8 @@ namespace Scaffold.WebApi.UnitTests.Filters
                 exceptionFilter.OnException(context);
 
                 // Assert
-                Assert.IsType<NoContentResult>(context.Result);
+                StatusCodeResult statusCodeResult = Assert.IsType<StatusCodeResult>(context.Result);
+                Assert.Equal(499, statusCodeResult.StatusCode);
             }
 
             [Fact]

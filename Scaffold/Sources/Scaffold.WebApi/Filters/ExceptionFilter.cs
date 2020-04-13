@@ -37,7 +37,7 @@ namespace Scaffold.WebApi.Filters
 
             if (context.Exception is OperationCanceledException)
             {
-                context.Result = new NoContentResult();
+                context.Result = new StatusCodeResult(499);
             }
         }
     }
