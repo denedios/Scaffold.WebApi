@@ -3,6 +3,7 @@ namespace Scaffold.Repositories.PostgreSQL.UnitTests
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Threading;
     using System.Threading.Tasks;
     using Microsoft.EntityFrameworkCore;
     using Scaffold.Application.Models;
@@ -463,6 +464,24 @@ namespace Scaffold.Repositories.PostgreSQL.UnitTests
             }
 
             [Fact]
+            public async Task When_GettingBucketAndCancellationIsRequested_Expect_OperationCanceledException()
+            {
+                // Arrange
+                Exception exception;
+
+                // Act
+                using (BucketContext context = new BucketContext(this.dbContextOptions))
+                {
+                    BucketRepository repository = new BucketRepository(context);
+                    exception = await Record.ExceptionAsync(() =>
+                        repository.GetAsync(new Random().Next(int.MaxValue), new CancellationToken(true)));
+                }
+
+                // Assert
+                Assert.IsType<OperationCanceledException>(exception);
+            }
+
+            [Fact]
             public async Task When_GettingBucketsWithPredicate_Expect_AllBuckets()
             {
                 // Arrange
@@ -721,6 +740,25 @@ namespace Scaffold.Repositories.PostgreSQL.UnitTests
                 Assert.NotEmpty(result);
                 Assert.Equal(1, result.Count);
                 Assert.Equal("Bucket 2", result[0].Name);
+            }
+
+            [Fact]
+            public async Task When_GettingBucketsAndCancellationIsRequested_Expect_OperationCanceledException()
+            {
+                // Arrange
+                Exception exception;
+
+                // Act
+                using (BucketContext context = new BucketContext(this.dbContextOptions))
+                {
+                    BucketRepository repository = new BucketRepository(context);
+                    exception = await Record.ExceptionAsync(() => repository.GetAsync(
+                        predicate: bucket => true,
+                        cancellationToken: new CancellationToken(true)));
+                }
+
+                // Assert
+                Assert.IsType<OperationCanceledException>(exception);
             }
         }
 
