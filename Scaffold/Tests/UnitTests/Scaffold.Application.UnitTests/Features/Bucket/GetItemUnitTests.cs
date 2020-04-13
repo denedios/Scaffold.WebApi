@@ -1,6 +1,7 @@
 namespace Scaffold.Application.UnitTests.Features.Bucket
 {
     using System;
+    using System.Threading;
     using System.Threading.Tasks;
     using Microsoft.EntityFrameworkCore;
     using Scaffold.Application.Features.Bucket;
@@ -112,6 +113,26 @@ namespace Scaffold.Application.UnitTests.Features.Bucket
 
                 // Assert
                 Assert.IsType<BucketNotFoundException>(exception);
+            }
+
+            [Fact]
+            public async Task When_GettingItemFromBucketAndCancellationIsRequested_Expect_OperationCanceledException()
+            {
+                // Arrange
+                GetItem.Query query = new GetItem.Query
+                {
+                    BucketId = new Random().Next(int.MaxValue),
+                    ItemId = new Random().Next(int.MaxValue),
+                };
+
+                GetItem.Handler handler = new GetItem.Handler(this.repository);
+
+                // Act
+                Exception exception = await Record.ExceptionAsync(() =>
+                    handler.Handle(query, new CancellationToken(true)));
+
+                // Assert
+                Assert.IsType<OperationCanceledException>(exception);
             }
         }
     }
